@@ -6,13 +6,11 @@ set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_SOURCE_DIR}/cmake/")
 set(OpenGL_GL_PREFERENCE GLVND)
 
 find_package(OpenGL REQUIRED)
-find_package(GLEW REQUIRED)
-find_package(GLFW3 REQUIRED)
 find_package(GLUT REQUIRED)
 
-include_directories( ${OPENGL_INCLUDE_DIRS}  ${GLUT_INCLUDE_DIRS} ${GLEW_INCLUDE_DIRS} ${GLFW3_INCLUDE_DIRS} )
+include_directories( ${OPENGL_INCLUDE_DIRS}  ${GLUT_INCLUDE_DIRS} )
 
-set(LIBS ${GLFW3_LIBRARIES} ${GLEW_LIBRARIES} ${OPENGL_LIBRARIES} ${GLUT_LIBRARIES}  ${CMAKE_DL_LIBS})
+set(LIBS ${OPENGL_LIBRARIES} ${GLUT_LIBRARIES}  ${CMAKE_DL_LIBS})
 
 add_executable(bezier bezier.asm main.c)
 target_link_libraries(bezier ${LIBS})
