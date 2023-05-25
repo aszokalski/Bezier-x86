@@ -5,5 +5,11 @@
   "dependencies" : [ {
     "name" : "opengl",
     "version>=" : "2022-12-04#3"
+  }, {
+    "name" : "glew",
+    "version>=" : "2.2.0#3"
+  }, {
+    "name" : "freeglut",
+    "version>=" : "3.4.0"
   } ]
 }
