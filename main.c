@@ -96,18 +96,15 @@ void addPoint(int x, int y){
 	        printf("Drawing the curve...\n");
 	        unsigned int lastX = pointsX[1];
 	        unsigned int lastY = pointsY[1];
-	        printf("b: (%d, %d)\n", lastX, lastY);
 
 	        for(int i = 1; i < MAX_POINTS-1; ++i){
 	            pointsX[i] = pointsX[i+1];
 	            pointsY[i] = pointsY[i+1];
 	        }
-	        printf("a: (%d, %d)\n", lastX, lastY);
 
 	        pointsX[MAX_POINTS - 1] = lastX;
 	        pointsY[MAX_POINTS - 1] = lastY;
-	        int x = bezier(pixels, HEIGHT, WIDTH, pointsX, pointsY, MAX_POINTS);
-	        printf("%i\n", x);
+	        bezier(pixels, pointsX, pointsY, MAX_POINTS, WIDTH, HEIGHT);
 
 	        for(int i = MAX_POINTS-1; i >= 2; --i){
 		        pointsX[i] = pointsX[i-1];
