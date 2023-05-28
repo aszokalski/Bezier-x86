@@ -1,6 +1,6 @@
-#ifndef _BEZIER_H
-#define _BEZIER_H
+#ifndef BEZIER_H
+#define BEZIER_H
 
-void bezier(int **pixelArray, size_t height, size_t width);
+int bezier(unsigned char *pixelArray, size_t height, size_t width, unsigned int *pointsX, unsigned int *pointsY, int n);
 
-#endif //_BEZIER_H
+#endif //BEZIER_H

@@ -1,31 +1,23 @@
 #include <stdio.h>
-#include <stdlib.h>
-#include <stdbool.h>
-#include <math.h>
-
-
 #include <GL/glut.h>
 
 #include "bezier.h"
 
-// Define the pixel array dimensions
 #define WIDTH 640
 #define HEIGHT 480
 #define MAX_POINTS 5
 
-// Define the pixel array
-unsigned char pixels[WIDTH * HEIGHT * 3];
-unsigned int pointsX[5], pointsY[5];
+unsigned char pixels[WIDTH * HEIGHT];
+unsigned int pointsX[MAX_POINTS], pointsY[MAX_POINTS];
 unsigned int n_points = 0;
 
-// Function to display the pixel array
 void display()
 {
 	printf("rerender\n");
     glClear(GL_COLOR_BUFFER_BIT);
 	glColor3f(1.0f, 1.0f, 1.0f); // Set color to white
     // Load the pixel array as a texture
-    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, WIDTH, HEIGHT, 0, GL_RGB, GL_UNSIGNED_BYTE, pixels);
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_LUMINANCE, WIDTH, HEIGHT, 0, GL_LUMINANCE, GL_UNSIGNED_BYTE, pixels);
 
     // Enable texturing
     glEnable(GL_TEXTURE_2D);
@@ -65,13 +57,11 @@ void display()
 	}
 	glEnd();
 
-	// Set smaller point size for the remaining points
 	glPointSize(smallPointSize);
 
 	// Draw the remaining points in different colors
 	glBegin(GL_POINTS);
 	for (int i = 2; i < n_points; i++) {
-		// Set a different color for each point
 		if (i == 2)
 			glColor3f(1.0f, 0.0f, 0.0f); // Red
 		else if (i == 3)
@@ -104,8 +94,32 @@ void addPoint(int x, int y){
         ++n_points;
         if(n_points == MAX_POINTS){
 	        printf("Drawing the curve...\n");
+	        unsigned int lastX = pointsX[1];
+	        unsigned int lastY = pointsY[1];
+	        printf("b: (%d, %d)\n", lastX, lastY);
+
+	        for(int i = 1; i < MAX_POINTS-1; ++i){
+	            pointsX[i] = pointsX[i+1];
+	            pointsY[i] = pointsY[i+1];
+	        }
+	        printf("a: (%d, %d)\n", lastX, lastY);
+
+	        pointsX[MAX_POINTS - 1] = lastX;
+	        pointsY[MAX_POINTS - 1] = lastY;
+	        int x = bezier(pixels, HEIGHT, WIDTH, pointsX, pointsY, MAX_POINTS);
+	        printf("%i\n", x);
+
+	        for(int i = MAX_POINTS-1; i >= 2; --i){
+		        pointsX[i] = pointsX[i-1];
+		        pointsY[i] = pointsY[i-1];
+	        }
+
+	        pointsX[1] = lastX;
+	        pointsY[1] = lastY;
+
         }
 
+	    // Refresh the display
 	    glutPostRedisplay();
     }
 }
@@ -120,12 +134,10 @@ void handleKeyboardEvent(unsigned char key, int x, int y)
 {
 	if (key == 8) // Backspace key
 	{
-		// Remove the last point if there are points available
 		if (n_points > 0){
 			n_points--;
 			printf("Point removed\n");
 		}
-
 
 		// Refresh the display
 		glutPostRedisplay();
@@ -135,9 +147,7 @@ void handleKeyboardEvent(unsigned char key, int x, int y)
 // Initializes GLUT, the display mode, and main window; registers callbacks;
 // enters the main event loop.
 int main(int argc, char** argv) {
-    // Use a single buffered window in RGB mode (as opposed to a double-buffered
-    // window or color-index mode).
-    for(int i = 0; i < WIDTH * HEIGHT * 3; ++i){
+    for(int i = 0; i < WIDTH * HEIGHT; ++i){
         pixels[i] = 255;
     }
     glutInit(&argc, argv);
@@ -147,15 +157,11 @@ int main(int argc, char** argv) {
     glutInitWindowSize(WIDTH, HEIGHT);
     glutCreateWindow("Bezier Editor");
 
-    // Tell GLUT that whenever the main window needs to be repainted that it
-    // should call the function display().
+
     glutDisplayFunc(display);
 
     glutMouseFunc(handleMouseEvent);
 	glutKeyboardFunc(handleKeyboardEvent);
 
-    // Tell GLUT to start reading and processing events.  This function
-    // never returns; the program only exits when the user closes the main
-    // window or kills the process.
     glutMainLoop();
 }
