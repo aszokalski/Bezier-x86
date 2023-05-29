@@ -1,4 +1,3 @@
-#include <stdio.h>
 #include <GL/glut.h>
 
 #include "bezier.h"
@@ -63,6 +62,10 @@ void display()
 				break;
 		}
 
+		if(i == selectedPoint){
+			glColor3f(0.2989f, 0.5870f, 0.1140f); // Black
+		}
+
 		float ndcX = (2.0f * (float)pointsX[i]) / WIDTH - 1.0f;
 		float ndcY = 1.0f - (2.0f * (float)pointsY[i]) / HEIGHT;
 
@@ -103,8 +106,12 @@ void addPoint(int x, int y)
 	{
 		pointsX[n_points] = x;
 		pointsY[n_points] = y;
+		selectedPoint = (int)n_points;
 		++n_points;
 		update();
+	} else{
+		selectedPoint= -1;
+		glutPostRedisplay();
 	}
 }
 
@@ -125,15 +132,8 @@ void handleMouseEvent(int button, int state, int x, int y)
 		// Check if a point is selected
 		for (int i = 0; i < n_points; i++)
 		{
-			float ndcX = (2.0f * (float)pointsX[i]) / WIDTH - 1.0f;
-			float ndcY = 1.0f - (2.0f * (float)pointsY[i]) / HEIGHT;
-
-			// Convert NDC coordinates to screen coordinates
-			int screenX = (int)((ndcX + 1.0f) / 2.0f * WIDTH);
-			int screenY = (int)((1.0f - ndcY) / 2.0f * HEIGHT);
-
 			// Check if the mouse click is within the range of the point
-			if (abs(screenX - x) <= 5 && abs(screenY - y) <= 5)
+			if (abs((int)pointsX[i] - x) <= 5 && abs((int)pointsY[i] - y) <= 5)
 			{
 				selectedPoint = i;
 				return;
@@ -142,10 +142,6 @@ void handleMouseEvent(int button, int state, int x, int y)
 
 		// If no point is selected, add a new point
 		addPoint(x, y);
-	}
-	else if (button == GLUT_LEFT_BUTTON && state == GLUT_UP)
-	{
-		selectedPoint = -1; // Reset selected point when mouse button is released
 	}
 }
 
@@ -156,11 +152,18 @@ void handleMotionEvent(int x, int y)
 
 void handleKeyboardEvent(unsigned char key, int x, int y)
 {
-	if (key == 8) // Backspace key
+	if (key == 8 && n_points > 0 && selectedPoint >= 0) // Backspace key
 	{
-		if (n_points > 0)
-			n_points--;
+		for(int i = 0, j = 0; i < n_points; ++i){
+			if(i != selectedPoint){
+				pointsX[j] = pointsX[i];
+				pointsY[j] = pointsY[i];
+				++j;
+			}
+		}
 
+		n_points--;
+		selectedPoint = (int)n_points-1;
 
 		update();
 	}

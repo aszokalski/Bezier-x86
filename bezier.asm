@@ -1,6 +1,6 @@
 section .data
     t_beg:  dq 0.0
-    t_step: dq 0.0001
+    t_step: dq 0.01
     t_end:  dq 1.0
 
 section .bss
