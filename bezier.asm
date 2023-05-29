@@ -1,6 +1,6 @@
 section .data
     t_beg:  dq 0.0
-    t_step: dq 0.1
+    t_step: dq 0.0001
     t_end:  dq 1.0
 
 section .bss
@@ -140,7 +140,7 @@ end_point_loop:
     ; Increment t
     addsd xmm0, xmm1                ; t_beg += t_step
     ucomisd xmm0, xmm2              ; compare less than
-    jl t_loop                       ; t_beg < t_end -> loop_t
+    jc t_loop                       ; t_beg < t_end -> loop_t
 end_t_loop:
     ; Epilogue
 	pop		r12

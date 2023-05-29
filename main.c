@@ -106,12 +106,6 @@ void addPoint(int x, int y){
 	        pointsY[MAX_POINTS - 1] = lastY;
 	        bezier(pixels, pointsX, pointsY, MAX_POINTS, WIDTH, HEIGHT);
 
-	        for(int i = 0; i < HEIGHT*WIDTH; ++i){
-	            if(pixels[i] == 0){
-	                printf("aaa\n");
-	            }
-	        }
-
 	        for(int i = MAX_POINTS-1; i >= 2; --i){
 		        pointsX[i] = pointsX[i-1];
 		        pointsY[i] = pointsY[i-1];
@@ -168,8 +162,6 @@ int main(int argc, char** argv) {
     for(int i = 0; i < WIDTH * HEIGHT; ++i){
         pixels[i] = 255;
     }
-	test();
-	return 0;
 
     glutInit(&argc, argv);
     glutInitDisplayMode(GLUT_SINGLE | GLUT_RGB);
