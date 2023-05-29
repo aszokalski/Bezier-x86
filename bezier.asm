@@ -59,7 +59,7 @@ global bezier
 ; - rdi = unsigned char *(1 byte) *pixelArray
 ; - rsi = unsigned int *(4 bytes) *pointsX
 ; - rdx = unsigned int *(4 bytes) *pointsY
-; - rcx = int (4 bytes) n
+; - rcx = unsigned int (4 bytes) n
 ; - r8 = int (4 bytes) pixel array width
 ; - r9 = int (4 bytes) pixel array height
 ; pixelArray[height*width] - pixels from the left bottom corner to the top right (0 to 255)
@@ -103,7 +103,8 @@ copy_loop:
     jnz copy_loop                   ; loop until counter reaches 0
 end_copy_loop:
     ; Prepare for point loop
-    mov r15, 4                      ; new array size = 4
+    mov r15, rcx
+    sub r15, 1                      ; new array size = n - 1
 point_loop:
     mov r10, tmp_x                  ; r10 = &tmp_x
     mov r11, tmp_y                  ; r11 = &tmp_y
