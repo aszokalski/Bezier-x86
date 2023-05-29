@@ -31,11 +31,25 @@ global bezier
 ; - %3: t register (xmm)
 ; Return to xa
 %macro CALCULATE_INTERPOLATION 3
-    sub %2, %1                  ; xb = xb - xa
-    cvtsi2sd xmm1, %2           ; xmm1 = (double) xb
+    ; Convert %1 to signed int
+    mov eax, %1
+    cdqe
+    mov %1, eax
 
-    mulsd xmm1, %3              ; xmm1 = t(xb - xa)
-    cvtsd2si %2, xmm1           ; xb = (int) xmm1
+    push rax                     ; push rax
+
+    ; Convert %2 to signed int
+    mov eax, %2
+    cdqe
+    mov %2, eax
+
+    pop rax                     ; load rax back from the stack
+
+    sub %2, %1                  ; xb = xb - xa
+    cvtsi2sd xmm5, %2           ; xmm1 = (double) xb
+
+    mulsd xmm5, %3              ; xmm1 = t(xb - xa)
+    cvtsd2si %2, xmm5           ; xb = (int) xmm1
     add %2, %1                  ; xb = (xb-xa)t + xa
     mov %1, %2                  ; Return to xa
 %endmacro
@@ -116,8 +130,8 @@ end_interpolation_loop:
     test r15, r15
     jnz point_loop                  ; loop until size is not 0
 end_point_loop:
-    mov r10, [r10 - 4]              ; r10 = result x
-    mov r11, [r11 - 4]              ; r11 = result y
+    mov r10d, [r10 - 4]             ; r10d = result x (upper half will be zeroed)
+    mov r11d, [r11 - 4]             ; r11d = result y (upper half will be zeroed)
 
     CALCULATE_INDEX r13, r14, r10, r11 ; rax = index
 
@@ -125,7 +139,7 @@ end_point_loop:
 
     ; Increment t
     addsd xmm0, xmm1                ; t_beg += t_step
-    cmpsd xmm0, xmm2, 1             ; compare less than
+    ucomisd xmm0, xmm2              ; compare less than
     jl t_loop                       ; t_beg < t_end -> loop_t
 end_t_loop:
     ; Epilogue
